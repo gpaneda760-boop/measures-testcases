@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Measures CGM App - Test Cases</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; padding: 20px; margin: 0; }
+    h1 { text-align: center; margin-bottom: 10px; }
+    h2 { margin-top: 30px; margin-bottom: 10px; }
+    .positive { color: #4ade80; }
+    .negative { color: #f87171; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #2d2d44; font-weight: bold; position: sticky; top: 0; }
+    tr:nth-child(even) { background: #252538; }
+    tr:nth-child(odd) { background: #1e1e30; }
+    td[contenteditable="true"]:focus { outline: 2px solid #60a5fa; background: #333; }
+    td { white-space: pre-line; }
+    .status-cell { text-align: center; white-space: nowrap; }
+    .status-cell label { margin: 0 3px; cursor: pointer; font-size: 12px; }
+    .pass-label { color: #4ade80; }
+    .fail-label { color: #f87171; }
+    input[type="radio"] { cursor: pointer; }
+    .instructions { background: #2d2d44; padding: 10px 15px; border-radius: 5px; margin-bottom: 20px; font-size: 13px; }
+    .delete-cell { text-align: center; }
+    .delete-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+    .delete-btn:hover { background: #dc2626; }
+    .jira-cell { min-width: 100px; }
+  </style>
+</head>
+<body>
+  <h1>Measures CGM App - Test Cases</h1>
+  
+  <div style="background: #2d2d44; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0; color: #60a5fa;">Regression Info</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+      <div>
+        <label style="font-size: 12px; color: #aaa;">Regression Round</label><br>
+        <input type="text" id="regressionRound" placeholder="e.g., R1, R2, UAT" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #1e1e30; color: #eee; margin-top: 4px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #aaa;">Build Version</label><br>
+        <input type="text" id="buildVersion" placeholder="e.g., 1.0.0-beta.5" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #1e1e30; color: #eee; margin-top: 4px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #aaa;">Test Date</label><br>
+        <input type="date" id="testDate" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #1e1e30; color: #eee; margin-top: 4px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #aaa;">Tester Name</label><br>
+        <input type="text" id="testerName" placeholder="e.g., John Doe" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #1e1e30; color: #eee; margin-top: 4px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #aaa;">Environment</label><br>
+        <input type="text" id="environment" placeholder="e.g., Staging, Production" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #1e1e30; color: #eee; margin-top: 4px;">
+      </div>
+      <div>
+        <label style="font-size: 12px; color: #aaa;">Device / OS</label><br>
+        <input type="text" id="deviceOS" placeholder="e.g., iPhone 15 Pro, iOS 17.2" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #444; background: #1e1e30; color: #eee; margin-top: 4px;">
+      </div>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <strong>Instructions:</strong> All cells are editable. Select PASS/FAIL for each test. Add JIRA links for failed tests. Use buttons to add/delete test cases and export.
+  </div>
+  <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+    <button style="background: #10b981; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;" onclick="exportCSV()">⬇️ EXPORT TO CSV</button>
+    <button style="background: #3b82f6; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;" onclick="addTestCase('positive')">➕ ADD POSITIVE TEST CASE</button>
+    <button style="background: #f59e0b; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;" onclick="addTestCase('negative')">➕ ADD NEGATIVE TEST CASE</button>
+  </div>
+
+  <h2 class="positive">POSITIVE TEST CASES (Happy Path)</h2>
+  <table id="positiveTable">
+    <thead>
+      <tr><th>Test Case Name</th><th>Steps</th><th>Expected Result</th><th>Status</th><th>Notes</th><th>JIRA Bug Link</th><th>Del</th></tr>
+    </thead>
+    <tbody>
+      <tr><td contenteditable="true">P01 - Launch App Welcome Screen</td><td contenteditable="true">1. Launch Measures app</td><td contenteditable="true">Welcome screen displays with "Get better. Soon." tagline and Continue with Email/Apple/Google options</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p01" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p01" value="FAIL"> FAIL</label></td><td contenteditable="true">Verify branding and all sign-in options visible</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P02 - Continue with Email</td><td contenteditable="true">1. Tap "Continue with Email" on welcome screen</td><td contenteditable="true">Sign in with email modal appears with email input field and Continue button</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p02" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p02" value="FAIL"> FAIL</label></td><td contenteditable="true">Modal should overlay welcome screen</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P03 - Enter Valid Email</td><td contenteditable="true">1. Tap Continue with Email
+2. Enter valid email format
+3. Tap Continue</td><td contenteditable="true">App navigates to Verify your email screen showing 6-digit code entry</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p03" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p03" value="FAIL"> FAIL</label></td><td contenteditable="true">Email confirmation sent to entered address</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P04 - Enter Valid Verification Code</td><td contenteditable="true">1. Complete email entry
+2. Enter correct 6-digit verification code
+3. Tap Verify</td><td contenteditable="true">App navigates to Create a password screen</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p04" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p04" value="FAIL"> FAIL</label></td><td contenteditable="true">Code fields should auto-advance after each digit</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P05 - Request New Verification Code</td><td contenteditable="true">1. On Verify your email screen
+2. Tap "Send new verification code"</td><td contenteditable="true">New verification code is sent to email address</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p05" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p05" value="FAIL"> FAIL</label></td><td contenteditable="true">Previous code should be invalidated</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P06 - Change Email Address</td><td contenteditable="true">1. On Verify your email screen
+2. Tap "Change email address"</td><td contenteditable="true">Returns to email entry screen allowing new email input</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p06" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p06" value="FAIL"> FAIL</label></td><td contenteditable="true">Clears previous email entry</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P07 - Create Valid Password</td><td contenteditable="true">1. On Create a password screen
+2. Enter password meeting all requirements
+3. Tap Create account</td><td contenteditable="true">Account created successfully and proceeds to next onboarding step</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p07" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p07" value="FAIL"> FAIL</label></td><td contenteditable="true">Password: 8+ chars, letters, numbers, special chars</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P08 - Toggle Password Visibility</td><td contenteditable="true">1. On password screen
+2. Enter password
+3. Tap eye icon</td><td contenteditable="true">Password text toggles between hidden (dots) and visible</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p08" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p08" value="FAIL"> FAIL</label></td><td contenteditable="true">Icon should change state</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P09 - Existing User Login</td><td contenteditable="true">1. On Log in with Email screen
+2. Enter registered email
+3. Enter correct password
+4. Tap Log in</td><td contenteditable="true">User successfully logged in and proceeds to app</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p09" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p09" value="FAIL"> FAIL</label></td><td contenteditable="true">Welcome back message displayed</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P10 - Forgot Password Link</td><td contenteditable="true">1. On Log in screen
+2. Tap "Forgot your password?"</td><td contenteditable="true">Password recovery flow initiated</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p10" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p10" value="FAIL"> FAIL</label></td><td contenteditable="true">Should send reset email or show recovery options</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P11 - Enter First and Last Name</td><td contenteditable="true">1. On name entry screen
+2. Enter First Name
+3. Enter Last Name
+4. Tap Save</td><td contenteditable="true">Names saved to profile and proceeds to service area verification</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p11" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p11" value="FAIL"> FAIL</label></td><td contenteditable="true">Both fields required</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P12 - Confirm Service Area Valid Zip</td><td contenteditable="true">1. On service area screen
+2. Enter valid SF area 5-digit zip
+3. Tap Confirm</td><td contenteditable="true">Service area confirmed and proceeds to contact form</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p12" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p12" value="FAIL"> FAIL</label></td><td contenteditable="true">Currently limited to SF area</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P13 - Enter Complete Mailing Address</td><td contenteditable="true">1. Enter Street Address
+2. Enter Apt/Unit (optional)
+3. Enter City
+4. Select State
+5. Enter Phone
+6. Tap Save</td><td contenteditable="true">Contact information saved successfully</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p13" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p13" value="FAIL"> FAIL</label></td><td contenteditable="true">State uses dropdown selector</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P14 - Select State from Dropdown</td><td contenteditable="true">1. On contact form
+2. Tap State field</td><td contenteditable="true">Dropdown displays alphabetical list of US states for selection</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p14" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p14" value="FAIL"> FAIL</label></td><td contenteditable="true">Scrollable list</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P15 - Enter Valid Phone Number</td><td contenteditable="true">1. On contact form
+2. Tap Phone Number field
+3. Enter 10-digit phone number</td><td contenteditable="true">Phone number accepted and formatted correctly</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p15" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p15" value="FAIL"> FAIL</label></td><td contenteditable="true">Numeric keyboard displayed</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P16 - Allow Notifications</td><td contenteditable="true">1. When notification prompt appears
+2. Tap "Allow"</td><td contenteditable="true">App granted notification permissions</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p16" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p16" value="FAIL"> FAIL</label></td><td contenteditable="true">iOS system prompt</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P17 - Decline Notifications</td><td contenteditable="true">1. When notification prompt appears
+2. Tap "Don't Allow"</td><td contenteditable="true">App continues without notification permissions</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p17" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p17" value="FAIL"> FAIL</label></td><td contenteditable="true">User can enable later in settings</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P18 - Accept Disclaimer Agreement</td><td contenteditable="true">1. On disclaimer screen
+2. Read health/wellness disclaimer
+3. Tap "I understand and agree"</td><td contenteditable="true">User agreement recorded and proceeds to main app</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p18" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p18" value="FAIL"> FAIL</label></td><td contenteditable="true">ToS and Privacy Policy links visible</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P19 - Access Terms of Service</td><td contenteditable="true">1. On disclaimer screen
+2. Tap "Terms of Service" link</td><td contenteditable="true">Terms of Service document opens for review</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p19" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p19" value="FAIL"> FAIL</label></td><td contenteditable="true">Opens in browser or in-app viewer</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P20 - Access Privacy Policy</td><td contenteditable="true">1. On disclaimer screen
+2. Tap "Privacy Policy" link</td><td contenteditable="true">Privacy Policy document opens for review</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p20" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p20" value="FAIL"> FAIL</label></td><td contenteditable="true">Opens in browser or in-app viewer</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P21 - Sign In with Apple</td><td contenteditable="true">1. On welcome screen
+2. Tap Apple sign-in button</td><td contenteditable="true">Apple Sign-In sheet appears with Face ID/Touch ID or password option</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p21" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p21" value="FAIL"> FAIL</label></td><td contenteditable="true">iOS native authentication flow</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P22 - Sign In with Google</td><td contenteditable="true">1. On welcome screen
+2. Tap Google sign-in button</td><td contenteditable="true">Google Sign-In sheet appears with account selection</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p22" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p22" value="FAIL"> FAIL</label></td><td contenteditable="true">Google OAuth flow</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P23 - Hide My Email Option</td><td contenteditable="true">1. On email entry screen
+2. Tap "Hide My Email" above keyboard</td><td contenteditable="true">Apple Hide My Email flow initiated, generates private relay email</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p23" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p23" value="FAIL"> FAIL</label></td><td contenteditable="true">iOS feature for privacy</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P24 - Back Button Navigation</td><td contenteditable="true">1. Progress to any onboarding screen
+2. Tap back arrow button</td><td contenteditable="true">Returns to previous screen with data preserved</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p24" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p24" value="FAIL"> FAIL</label></td><td contenteditable="true">Test on each screen in flow</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P25 - Close Email Modal</td><td contenteditable="true">1. Tap Continue with Email
+2. Tap X button on modal</td><td contenteditable="true">Modal closes, returns to welcome screen</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p25" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p25" value="FAIL"> FAIL</label></td><td contenteditable="true">Data should be cleared</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P26 - Keyboard Dismiss</td><td contenteditable="true">1. On any text input screen
+2. Tap outside the input field</td><td contenteditable="true">Keyboard dismisses, input data preserved</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p26" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p26" value="FAIL"> FAIL</label></td><td contenteditable="true">Test on all input screens</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P27 - Phone Number Auto-Format</td><td contenteditable="true">1. On contact form
+2. Enter 10 digits continuously</td><td contenteditable="true">Phone number auto-formats with dashes (xxx-xxx-xxxx)</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p27" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p27" value="FAIL"> FAIL</label></td><td contenteditable="true">Format applied as user types</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P28 - App Resume During Onboarding</td><td contenteditable="true">1. Progress to mid-onboarding
+2. Background the app
+3. Resume app</td><td contenteditable="true">App resumes on same screen with data intact</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p28" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p28" value="FAIL"> FAIL</label></td><td contenteditable="true">State persistence check</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P29 - Scroll Disclaimer Content</td><td contenteditable="true">1. On disclaimer screen
+2. Scroll through full disclaimer text</td><td contenteditable="true">Full disclaimer text is scrollable and readable</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p29" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p29" value="FAIL"> FAIL</label></td><td contenteditable="true">Check if scroll required before accept</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">P30 - Optional Apt/Unit Field</td><td contenteditable="true">1. On contact form
+2. Fill all required fields
+3. Leave Apt/Unit empty
+4. Tap Save</td><td contenteditable="true">Form submits successfully without Apt/Unit</td><td class="status-cell"><label class="pass-label"><input type="radio" name="p30" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="p30" value="FAIL"> FAIL</label></td><td contenteditable="true">Apt/Unit is optional field</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="negative">NEGATIVE TEST CASES (Error Handling)</h2>
+  <table id="negativeTable">
+    <thead>
+      <tr><th>Test Case Name</th><th>Steps</th><th>Expected Result</th><th>Status</th><th>Notes</th><th>JIRA Bug Link</th><th>Del</th></tr>
+    </thead>
+    <tbody>
+      <tr><td contenteditable="true">N01 - Empty Email Submission</td><td contenteditable="true">1. Tap Continue with Email
+2. Leave email field empty
+3. Tap Continue</td><td contenteditable="true">Error displayed - email required. Continue button disabled or shows validation error</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n01" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n01" value="FAIL"> FAIL</label></td><td contenteditable="true">Button may be disabled until valid input</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N02 - Invalid Email Format</td><td contenteditable="true">1. Tap Continue with Email
+2. Enter "notanemail" without @
+3. Tap Continue</td><td contenteditable="true">Error displayed indicating invalid email format</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n02" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n02" value="FAIL"> FAIL</label></td><td contenteditable="true">Test various invalid formats</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N03 - Email with Spaces</td><td contenteditable="true">1. Enter email with spaces "user @domain.com"
+2. Tap Continue</td><td contenteditable="true">Error displayed or spaces auto-trimmed</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n03" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n03" value="FAIL"> FAIL</label></td><td contenteditable="true">Spaces not allowed in email</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N04 - Incorrect Verification Code</td><td contenteditable="true">1. On verify email screen
+2. Enter wrong 6-digit code
+3. Tap Verify</td><td contenteditable="true">Error message displayed - invalid code</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n04" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n04" value="FAIL"> FAIL</label></td><td contenteditable="true">Should allow retry</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N05 - Incomplete Verification Code</td><td contenteditable="true">1. On verify email screen
+2. Enter only 3 digits</td><td contenteditable="true">Verify button remains disabled</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n05" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n05" value="FAIL"> FAIL</label></td><td contenteditable="true">All 6 fields required</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N06 - Expired Verification Code</td><td contenteditable="true">1. Wait for code expiration period
+2. Enter expired code
+3. Tap Verify</td><td contenteditable="true">Error message - code expired. Prompt to request new code</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n06" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n06" value="FAIL"> FAIL</label></td><td contenteditable="true">Test timeout duration</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N07 - Password Too Short</td><td contenteditable="true">1. On create password screen
+2. Enter password less than 8 characters</td><td contenteditable="true">Validation shows "8 characters" unchecked. Create account disabled</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n07" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n07" value="FAIL"> FAIL</label></td><td contenteditable="true">Real-time validation</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N08 - Password Without Numbers</td><td contenteditable="true">1. Enter password with only letters "ABCDefgh"</td><td contenteditable="true">Validation shows "letters, numbers, special chars" unchecked</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n08" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n08" value="FAIL"> FAIL</label></td><td contenteditable="true">Missing number requirement</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N09 - Password Without Special Chars</td><td contenteditable="true">1. Enter password "ABCDefgh123"</td><td contenteditable="true">Validation shows special character requirement unchecked</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n09" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n09" value="FAIL"> FAIL</label></td><td contenteditable="true">Missing special char requirement</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N10 - Password Without Letters</td><td contenteditable="true">1. Enter password "12345678!@"</td><td contenteditable="true">Validation shows requirement for letters unchecked</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n10" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n10" value="FAIL"> FAIL</label></td><td contenteditable="true">Missing letter requirement</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N11 - Password With Spaces</td><td contenteditable="true">1. Enter password containing spaces "Pass word1!"</td><td contenteditable="true">Error - password cannot contain spaces</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n11" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n11" value="FAIL"> FAIL</label></td><td contenteditable="true">Spaces explicitly not allowed per UI</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N12 - Easy to Guess Password</td><td contenteditable="true">1. Enter common password like "Password1!"</td><td contenteditable="true">Validation shows "Not easy to guess" unchecked</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n12" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n12" value="FAIL"> FAIL</label></td><td contenteditable="true">Should detect common patterns</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N13 - Wrong Password on Login</td><td contenteditable="true">1. On login screen
+2. Enter valid email
+3. Enter incorrect password
+4. Tap Log in</td><td contenteditable="true">Error message - incorrect password</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n13" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n13" value="FAIL"> FAIL</label></td><td contenteditable="true">Should not reveal if email exists</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N14 - Empty Name Fields</td><td contenteditable="true">1. On name screen
+2. Leave First/Last Name empty
+3. Tap Save</td><td contenteditable="true">Save button disabled or error shown - names required</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n14" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n14" value="FAIL"> FAIL</label></td><td contenteditable="true">Both fields mandatory</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N15 - First Name Only</td><td contenteditable="true">1. Enter First Name
+2. Leave Last Name empty
+3. Tap Save</td><td contenteditable="true">Error - Last Name required</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n15" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n15" value="FAIL"> FAIL</label></td><td contenteditable="true">Both fields required</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N16 - Invalid Zip Code Format</td><td contenteditable="true">1. On service area screen
+2. Enter "ABCDE" letters
+3. Tap Confirm</td><td contenteditable="true">Error - invalid zip code format</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n16" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n16" value="FAIL"> FAIL</label></td><td contenteditable="true">Should only accept numbers</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N17 - Zip Code Too Short</td><td contenteditable="true">1. Enter only 3 digits "941"
+2. Tap Confirm</td><td contenteditable="true">Confirm button disabled - requires 5 digits</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n17" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n17" value="FAIL"> FAIL</label></td><td contenteditable="true">5-digit zip required</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N18 - Unsupported Service Area</td><td contenteditable="true">1. Enter valid zip outside SF (e.g. 10001 NYC)</td><td contenteditable="true">Message: "Not yet, but soon" - service unavailable</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n18" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n18" value="FAIL"> FAIL</label></td><td contenteditable="true">App limited to SF area currently</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N19 - Invalid Phone Number</td><td contenteditable="true">1. On contact form
+2. Enter phone with letters or too few digits</td><td contenteditable="true">Error - invalid phone number format</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n19" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n19" value="FAIL"> FAIL</label></td><td contenteditable="true">Should require valid 10-digit number</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N20 - Incomplete Address Submission</td><td contenteditable="true">1. Fill only Street Address
+2. Leave City/State/Phone empty
+3. Tap Save</td><td contenteditable="true">Error - required fields missing. Save disabled</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n20" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n20" value="FAIL"> FAIL</label></td><td contenteditable="true">City, State, Phone required</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N21 - Network Loss During Email Verify</td><td contenteditable="true">1. Enter email and tap Continue
+2. Disable network
+3. Enter verification code
+4. Tap Verify</td><td contenteditable="true">Error message displayed - no network connection</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n21" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n21" value="FAIL"> FAIL</label></td><td contenteditable="true">Graceful error handling</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N22 - Network Loss During Account Create</td><td contenteditable="true">1. Complete to password screen
+2. Disable network
+3. Enter valid password
+4. Tap Create account</td><td contenteditable="true">Error message displayed - unable to create account, retry option</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n22" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n22" value="FAIL"> FAIL</label></td><td contenteditable="true">Should not lose entered data</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N23 - Duplicate Email Registration</td><td contenteditable="true">1. Enter email already registered
+2. Tap Continue</td><td contenteditable="true">Error or redirect to login - account already exists</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n23" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n23" value="FAIL"> FAIL</label></td><td contenteditable="true">Should guide to login flow</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N24 - Apple Sign-In Cancelled</td><td contenteditable="true">1. Tap Apple sign-in
+2. Cancel Apple authentication</td><td contenteditable="true">Returns to welcome screen, no error shown</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n24" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n24" value="FAIL"> FAIL</label></td><td contenteditable="true">User-initiated cancel</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N25 - Google Sign-In Cancelled</td><td contenteditable="true">1. Tap Google sign-in
+2. Cancel Google authentication</td><td contenteditable="true">Returns to welcome screen, no error shown</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n25" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n25" value="FAIL"> FAIL</label></td><td contenteditable="true">User-initiated cancel</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N26 - Session Timeout</td><td contenteditable="true">1. Start onboarding
+2. Leave app idle for extended period
+3. Attempt to continue</td><td contenteditable="true">Session expired message, restart onboarding or re-authenticate</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n26" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n26" value="FAIL"> FAIL</label></td><td contenteditable="true">Determine timeout duration</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N27 - Rapid Verification Code Requests</td><td contenteditable="true">1. On verify screen
+2. Tap "Send new code" multiple times rapidly</td><td contenteditable="true">Rate limiting applied - message shown to wait before requesting again</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n27" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n27" value="FAIL"> FAIL</label></td><td contenteditable="true">Prevent abuse</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N28 - Special Characters in Name</td><td contenteditable="true">1. On name screen
+2. Enter name with special chars "John@#$"
+3. Tap Save</td><td contenteditable="true">Error displayed or special characters stripped/rejected</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n28" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n28" value="FAIL"> FAIL</label></td><td contenteditable="true">Define allowed characters</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N29 - Extremely Long Input Values</td><td contenteditable="true">1. On any text field
+2. Enter extremely long string (500+ chars)</td><td contenteditable="true">Input truncated or max length enforced</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n29" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n29" value="FAIL"> FAIL</label></td><td contenteditable="true">Test all text fields</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+      <tr><td contenteditable="true">N30 - Non-US Phone Number</td><td contenteditable="true">1. On contact form
+2. Enter international phone format</td><td contenteditable="true">Error - US phone numbers only, or accepts international format</td><td class="status-cell"><label class="pass-label"><input type="radio" name="n30" value="PASS"> PASS</label><label class="fail-label"><input type="radio" name="n30" value="FAIL"> FAIL</label></td><td contenteditable="true">Clarify supported formats</td><td class="jira-cell" contenteditable="true"></td><td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    let positiveCount = 30;
+    let negativeCount = 30;
+
+    function addTestCase(type) {
+      let tableId, prefix;
+      if (type === 'positive') {
+        tableId = 'positiveTable';
+        positiveCount++;
+        prefix = 'P' + positiveCount;
+      } else {
+        tableId = 'negativeTable';
+        negativeCount++;
+        prefix = 'N' + negativeCount;
+      }
+      
+      const table = document.getElementById(tableId);
+      const tbody = table.querySelector('tbody');
+      const row = document.createElement('tr');
+      const radioName = prefix.toLowerCase();
+      
+      row.innerHTML = `
+        <td contenteditable="true">${prefix} - New Test Case</td>
+        <td contenteditable="true">1. Step one
+2. Step two</td>
+        <td contenteditable="true">Expected result</td>
+        <td class="status-cell">
+          <label class="pass-label"><input type="radio" name="${radioName}" value="PASS"> PASS</label>
+          <label class="fail-label"><input type="radio" name="${radioName}" value="FAIL"> FAIL</label>
+        </td>
+        <td contenteditable="true">Notes</td>
+        <td class="jira-cell" contenteditable="true"></td>
+        <td class="delete-cell"><button class="delete-btn" onclick="deleteRow(this)">🗑️</button></td>
+      `;
+      tbody.appendChild(row);
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function deleteRow(btn) {
+      if (confirm('Delete this test case?')) {
+        btn.closest('tr').remove();
+      }
+    }
+
+    function exportCSV() {
+      const regRound = document.getElementById('regressionRound').value || '';
+      const buildVer = document.getElementById('buildVersion').value || '';
+      const testDate = document.getElementById('testDate').value || '';
+      const tester = document.getElementById('testerName').value || '';
+      const env = document.getElementById('environment').value || '';
+      const device = document.getElementById('deviceOS').value || '';
+      
+      let csv = 'REGRESSION INFO\n';
+      csv += 'Regression Round,' + regRound + '\n';
+      csv += 'Build Version,' + buildVer + '\n';
+      csv += 'Test Date,' + testDate + '\n';
+      csv += 'Tester Name,' + tester + '\n';
+      csv += 'Environment,' + env + '\n';
+      csv += 'Device / OS,' + device + '\n';
+      csv += '\n';
+      csv += 'Test Case Name,Steps,Expected Result,Status,Notes,JIRA Bug Link\n';
+      
+      const tables = ['positiveTable', 'negativeTable'];
+      tables.forEach(tableId => {
+        const table = document.getElementById(tableId);
+        if (table) {
+          const rows = table.querySelectorAll('tbody tr');
+          rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const name = '"' + cells[0].innerText.replace(/"/g, '""') + '"';
+            const steps = '"' + cells[1].innerText.replace(/"/g, '""') + '"';
+            const expected = '"' + cells[2].innerText.replace(/"/g, '""') + '"';
+            const radios = cells[3].querySelectorAll('input[type="radio"]');
+            let status = '';
+            radios.forEach(r => { if (r.checked) status = r.value; });
+            const notes = '"' + cells[4].innerText.replace(/"/g, '""') + '"';
+            const jira = '"' + cells[5].innerText.replace(/"/g, '""') + '"';
+            csv += name + ',' + steps + ',' + expected + ',' + status + ',' + notes + ',' + jira + '\n';
+          });
+        }
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'measures_test_cases.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
